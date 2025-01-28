@@ -49,9 +49,15 @@ async function run() {
     //all product collection
     app.get("/all-products", async (req, res) => {
       const search = req.query.search;
+      const filter = req.query.filter;
+      console.log(filter);
       let query = {};
       if (search) {
         query = { product_name: { $regex: search, $options: "i" } };
+      }
+
+      if (filter) {
+        query = { category: { $regex: filter, $options: "i" } };
       }
       const result = await productsCollection.find(query).toArray();
       res.send(result);
