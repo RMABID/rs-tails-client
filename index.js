@@ -22,9 +22,38 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const productsCollection = client.db("RS-Tails").collection("product");
+    const userCollection = client.db("RS-Tails").collection("user");
+    const loanCollection = client.db("RS-Tails").collection("loan");
+    const currentLoanCollection = client
+      .db("RS-Tails")
+      .collection("current-loan");
 
+    //user collection
+
+    app.post("/rs-users", async (req, res) => {
+      const newUser = req.body;
+      const query = { email: newUser?.email };
+      const isExist = await userCollection.findOne(query);
+      if (isExist) {
+        return res.send({ message: "User Already Existed", insertedId: null });
+      }
+      const result = await userCollection.insertOne({
+        ...newUser,
+        role: "User",
+        timestamp: Date.now(),
+      });
+
+      res.send(result);
+    });
+
+    //all product collection
     app.get("/all-products", async (req, res) => {
-      const result = await productsCollection.find().toArray();
+      const search = req.query.search;
+      let query = {};
+      if (search) {
+        query = { product_name: { $regex: search, $options: "i" } };
+      }
+      const result = await productsCollection.find(query).toArray();
       res.send(result);
     });
 
@@ -134,6 +163,25 @@ async function run() {
       const query = { _id: new ObjectId(id) };
       const result = await productsCollection.deleteOne(query);
       res.send(result);
+    });
+    //Rs tails Loan collection
+
+    app.post("/rs-loan", async (req, res) => {
+      const newLoan = req.body;
+      return console.log(newLoan);
+      const result = await loanCollection.insertOne(newLoan);
+      res.send(result);
+    });
+
+    // current loan rs tails
+    app.post("/rs-current-loan", async (req, res) => {
+      const currentLoan = req.body;
+      const result = await currentLoanCollection.insertOne(currentLoan);
+      res.send(result);
+    });
+
+    app.patch("/rs-loan", async (req, res) => {
+      // const
     });
 
     // Connect the client to the server	(optional starting in v4.7)
