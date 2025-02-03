@@ -50,6 +50,7 @@ async function run() {
     app.get("/all-products", async (req, res) => {
       const search = req.query.search;
       const filter = req.query.filter;
+      const filterSize = req.query.filterSize;
       console.log(filter);
       let query = {};
       if (search) {
@@ -59,6 +60,11 @@ async function run() {
       if (filter) {
         query = { category: { $regex: filter, $options: "i" } };
       }
+
+      if (filterSize) {
+        query = { size: { $regex: filterSize } };
+      }
+
       const result = await productsCollection.find(query).toArray();
       res.send(result);
     });
@@ -191,12 +197,12 @@ async function run() {
     });
 
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
+    // await client.connect();
+    // // Send a ping to confirm a successful connection
+    // await client.db("admin").command({ ping: 1 });
+    // console.log(
+    //   "Pinged your deployment. You successfully connected to MongoDB!"
+    // );
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
