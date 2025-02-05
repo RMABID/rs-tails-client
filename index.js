@@ -141,17 +141,16 @@ async function run() {
     // Latest Product Add
     app.patch("/all-products/:id", async (req, res) => {
       const id = req.params.id;
+      const latest = req.body;
       const query = { _id: new ObjectId(id) };
-      const isExist = await productsCollection.findOne(query);
-      if (isExist.latest === "Added") {
-        return res.send("Already Add Latest");
-      }
+
       let updatedLatest = {
-        $set: { latest: "Added" },
+        $set: { latest: latest.latests },
       };
+
       const result = await productsCollection.updateOne(query, updatedLatest);
-      console.log(query);
-      res.send(isExist);
+
+      res.send(result);
     });
 
     // quantity updated only
