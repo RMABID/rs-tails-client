@@ -138,6 +138,22 @@ async function run() {
       }
     });
 
+    // Latest Product Add
+    app.patch("/all-products/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const isExist = await productsCollection.findOne(query);
+      if (isExist.latest === "Added") {
+        return res.send("Already Add Latest");
+      }
+      let updatedLatest = {
+        $set: { latest: "Added" },
+      };
+      const result = await productsCollection.updateOne(query, updatedLatest);
+      console.log(query);
+      res.send(isExist);
+    });
+
     // quantity updated only
     app.patch("/product/:id", async (req, res) => {
       const id = req.params.id;
