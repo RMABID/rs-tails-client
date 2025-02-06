@@ -1,6 +1,7 @@
 const express = require("express");
 require("dotenv").config();
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
 const app = express();
 const port = process.env.POST || 5000;
 
@@ -27,6 +28,15 @@ async function run() {
     const currentLoanCollection = client
       .db("RS-Tails")
       .collection("current-loan");
+
+    //=== jwt related api ===//
+    app.post("/jwt", async (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.SECRET_ACCESS_TOKEN, {
+        expiresIn: "4h",
+      });
+      res.send({ token });
+    });
 
     //user collection
 
